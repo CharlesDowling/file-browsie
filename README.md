@@ -12,11 +12,11 @@ It can be installed by running the pip command through Command Prompt (cmd.exe):
 
 > pip install pyinstaller
 
-After installing pyinstaller you can build it by using Command Prompt to navigate to the directory for the file system you're building for
+After installing pyinstaller you can build it by using Command Prompt to navigate to the directory for the file system you're building for and running the compilation file
 
 > cd windows
 > 
-> pyinstaller main.py
+> compile.bat
 
 When compiled from source, the exe file will be present under the newly created directory "dist\main".
 
