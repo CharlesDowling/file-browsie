@@ -6,11 +6,11 @@ File-Browsie is a simple file explorer and file editor for focusing on programmi
 
 # Build
 File-Browsie is built using pyinstaller.
-It can be installed as follows:
+It can be installed by running the pip command through Command Prompt (cmd.exe):
 
 > pip install pyinstaller
 
-After installing pyinstaller you can build it by navigating to the directory for the file system you're building for
+After installing pyinstaller you can build it by using Command Prompt to navigate to the directory for the file system you're building for
 
 > cd windows
 > 
