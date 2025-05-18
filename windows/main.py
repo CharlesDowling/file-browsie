@@ -1,3 +1,4 @@
+
 ###
 ### FILE: main.py (ENTRY POINT)
 ### PROJECT: winf-file-browsie
@@ -85,10 +86,12 @@ def entry_enter_pressed(a=0):
     #Enable the console window to be updatable
     console_window.configure(state="normal")
 
+    console_entry_command = console_entry.get()
+
     ### Work around to ensure that the "cd command works properly"
     ### Also allows for a shifting CWD
-    if (console_entry.get()[0:2] == "cd"):
-        if (console_entry.get()[3:5] == ".."):
+    if (console_entry_command[0:2] == "cd"):
+        if (console_entry_command[3:5] == ".."):
 
             # Find the last occurence of the \ in the file string
             higher_directory_folder = current_dir.rfind("\\")
@@ -102,13 +105,13 @@ def entry_enter_pressed(a=0):
             #Shell output since actual shell outputs nothing
             outcome = "\nChanged CWD to: " + current_dir + "\n\n"
 
-        elif (console_entry.get()[4:5] == ":"):
-            command_str = console_entry.get()
-            if (os.path.exists(console_entry.get()[3:len(command_str)]) == True):
+        elif (console_entry_command[4:5] == ":"):
+            
+            if (os.path.exists(console_entry_command[3:len(console_entry_command)]) == True):
 
-                if (console_entry.get()[5:6] == "\\"):
+                if (console_entry_command[5:6] == "\\"):
                     
-                    current_dir = console_entry.get()[3:len(command_str)]
+                    current_dir = console_entry_command[3:len(console_entry_command)]
 
                     #Clear the entry box, data no longer needed
                     console_entry.delete(0,"end")
@@ -116,7 +119,7 @@ def entry_enter_pressed(a=0):
                     outcome = "\nChanged CWD to: " + current_dir + "\n"
 
                 else:
-                    current_dir = console_entry.get()[3:len(command_str)] + "\\"
+                    current_dir = console_entry_command[3:len(console_entry_command)] + "\\"
 
                     #Clear the entry box, data no longer needed
                     console_entry.delete(0,"end")
@@ -124,7 +127,7 @@ def entry_enter_pressed(a=0):
                     outcome = "\nChanged CWD to: " + current_dir + "\n"
 
             else:
-                outcome = "\nRequested location " + console_entry.get()[3:len(command_str)] + " does not exist!\n"
+                outcome = "\nRequested location " + console_entry_command[3:len(console_entry_command)] + " does not exist!\n"
 
                 #Clear the entry box, data no longer needed
                 console_entry.delete(0,"end")
@@ -132,16 +135,13 @@ def entry_enter_pressed(a=0):
         else:
 
             #Refactor the command so that the shell runs it properly
-            command = shlex.split(console_entry.get())
-
-            #Necessary to get the length for index end
-            command_str = console_entry.get()
+            command = shlex.split(console_entry_command)
 
             #Run the command in the shell
             outcome = subprocess.check_output(command, cwd=current_dir, shell=True, text=True)
 
             #Change the current working directory to something that works (Code below will not run if previous line of code does not work.)
-            current_dir = current_dir + "\\" + console_entry.get()[3:len(command_str)]
+            current_dir = current_dir + "\\" + console_entry_command[3:len(console_entry_command)]
 
             #Clear the entry box, data no longer needed
             console_entry.delete(0,"end")
@@ -150,13 +150,13 @@ def entry_enter_pressed(a=0):
             outcome = "\nChanged CWD to: " + current_dir + "\n\n"
 
     #Clear Screen Command
-    elif (console_entry.get()[0:3] == "cls" or console_entry.get()[0:5] == "clear"):
+    elif (console_entry_command[0:3] == "cls" or console_entry_command[0:5] == "clear"):
         console_window.delete("1.0","end")
         #Clear the entry box, data no longer needed
         console_entry.delete(0,"end")
 
     #Help command prints available commands
-    elif (console_entry.get()[0:4] == "help"):
+    elif (console_entry_command[0:4] == "help" or console_entry_command[0:4] == "HELP"):
         
         #Open up custom help file because help command does not work with subprocess
         with open(program_dir + "\\help.info", "r") as help:
@@ -170,19 +170,18 @@ def entry_enter_pressed(a=0):
         console_entry.delete(0,"end")
 
     #Opens a requested file in CWD
-    elif (console_entry.get()[0:4] == "open"):
+    elif (console_entry_command[0:4] == "open"):
 
-        command_str = console_entry.get()
         try:
-            with open((os.path.abspath( current_dir + "\\" + console_entry.get()[5:len(command_str)])), "r") as file:
+            with open((os.path.abspath( current_dir + "\\" + console_entry_command[5:len(console_entry_command)])), "r") as file:
                 for line in file:
                     editor_window.insert("end", line)
 
-            opened_file = current_dir + "\\" + console_entry.get()[5:len(command_str)]
+            opened_file = current_dir + "\\" + console_entry_command[5:len(console_entry_command)]
 
             editor_label.configure(text=("FILE EDITOR: " + opened_file))
 
-            outcome = "\nOpened file \"" + console_entry.get()[5:len(command_str)] + "\" in editor!\n"
+            outcome = "\nOpened file \"" + console_entry_command[5:len(console_entry_command)] + "\" in editor!\n"
         except:
             outcome = "No file specified!"
 
@@ -190,20 +189,18 @@ def entry_enter_pressed(a=0):
         console_entry.delete(0,"end")
 
     #Creates file in CWD
-    elif (console_entry.get()[0:6] == "create"):
+    elif (console_entry_command[0:6] == "create"):
 
-        command_str = console_entry.get()
-        open(console_entry.get()[7:len(command_str)], "x")
+        open(console_entry_command[7:len(console_entry_command)], "x")
 
-        outcome = "\nCreated file \"" + console_entry.get()[7:len(command_str)] + "\" in " + current_dir + "!\n"
+        outcome = "\nCreated file \"" + console_entry_command[7:len(console_entry_command)] + "\" in " + current_dir + "!\n"
 
         #Clear the entry box, data no longer needed
         console_entry.delete(0,"end")
     
     #Saves file in CWD
-    elif (console_entry.get()[0:4] == "save"):
-        command_str = console_entry.get()
-        if (len(command_str) == 4):
+    elif (console_entry_command[0:4] == "save"):
+        if (len(console_entry_command) == 4):
             if (opened_file == "" ):
 
                 #Clear the entry box, data no longer needed
@@ -221,30 +218,29 @@ def entry_enter_pressed(a=0):
                 outcome = "\nSaved data to file: " + opened_file + "\n"
 
         else:
-            with open((os.path.abspath( current_dir + "\\" + console_entry.get()[5:len(command_str)])), "w") as file:
+            with open((os.path.abspath( current_dir + "\\" + console_entry_command[5:len(console_entry_command)])), "w") as file:
                 file.write(editor_window.get(1.0,END))
 
-            outcome = "\nSaved data to file: " + command_str[6:len(command_str)] + "\n"
+            outcome = "\nSaved data to file: " + console_entry_command[6:len(console_entry_command)] + "\n"
 
             #Clear the entry box, data no longer needed
             console_entry.delete(0,"end")
 
 
-    elif (console_entry.get()[0:3] == "del"):
+    elif (console_entry_command[0:3] == "del"):
 
-        command = shlex.split(console_entry.get())
-        command_str = console_entry.get()
+        command = shlex.split(console_entry_command)
 
-        if (os.path.exists(command_str[4:len(command_str)]) == True):
+        if (os.path.exists(console_entry_command[4:len(console_entry_command)]) == True):
             subprocess.check_output(command, cwd=current_dir, shell=True, text=True)
-            outcome = "\nFile \"" + command_str[4:len(command_str)] + "\" deleted\n"
+            outcome = "\nFile \"" + console_entry_command[4:len(console_entry_command)] + "\" deleted\n"
         else:
             outcome = "\nFILE NOT FOUND!\n"
 
     else:
 
         #Format the command with flags and whatnot
-        command = shlex.split(console_entry.get())
+        command = shlex.split(console_entry_command)
 
         #Run the command and generate console output -> outcome
         outcome = subprocess.check_output(command, cwd=current_dir, shell=True, text=True)
@@ -266,6 +262,7 @@ def window_opened(a=0):
     #Initilizes Console window
     console_window.configure(state=NORMAL)
     console_window.insert("1.0", subprocess.check_output("dir", cwd=current_dir, shell=True, text=True))
+    console_window.insert("end", "\nTYPE HELP AND PRESS ENTER TO GET THE LIST OF COMMANDS FOR THIS PROGRAM.\n")
     console_window.configure(state=DISABLED)
 
     window.unbind("<Visibility>")
