@@ -86,12 +86,13 @@ def entry_enter_pressed(a=0):
     #Enable the console window to be updatable
     console_window.configure(state="normal")
 
+    #Store the console command into str
     console_entry_command = console_entry.get()
 
     ### Work around to ensure that the "cd command works properly"
     ### Also allows for a shifting CWD
-    if (console_entry_command[0:2] == "cd"):
-        if (console_entry_command[3:5] == ".."):
+    if (console_entry_command[0:2].lower() == "cd"):
+        if (console_entry_command[3:5].lower() == ".."):
 
             # Find the last occurence of the \ in the file string
             higher_directory_folder = current_dir.rfind("\\")
@@ -105,8 +106,9 @@ def entry_enter_pressed(a=0):
             #Shell output since actual shell outputs nothing
             outcome = "\nChanged CWD to: " + current_dir + "\n\n"
 
-        elif (console_entry_command[4:5] == ":"):
-            
+        #Checks if the next symbol is a ":"
+        elif (console_entry_command[4:5].lower() == ":"):
+
             if (os.path.exists(console_entry_command[3:len(console_entry_command)]) == True):
 
                 if (console_entry_command[5:6] == "\\"):
@@ -150,13 +152,13 @@ def entry_enter_pressed(a=0):
             outcome = "\nChanged CWD to: " + current_dir + "\n\n"
 
     #Clear Screen Command
-    elif (console_entry_command[0:3] == "cls" or console_entry_command[0:5] == "clear"):
+    elif (console_entry_command[0:3].lower() == "cls" or console_entry_command[0:5].lower() == "clear"):
         console_window.delete("1.0","end")
         #Clear the entry box, data no longer needed
         console_entry.delete(0,"end")
 
     #Help command prints available commands
-    elif (console_entry_command[0:4] == "help" or console_entry_command[0:4] == "HELP"):
+    elif (console_entry_command[0:4].lower() == "help"):
         
         #Open up custom help file because help command does not work with subprocess
         with open(program_dir + "\\help.info", "r") as help:
@@ -170,18 +172,25 @@ def entry_enter_pressed(a=0):
         console_entry.delete(0,"end")
 
     #Opens a requested file in CWD
-    elif (console_entry_command[0:4] == "open"):
+    elif (console_entry_command[0:4].lower() == "open"):
 
+        #Error Checking
         try:
+
+            #Open the file and load to editor
             with open((os.path.abspath( current_dir + "\\" + console_entry_command[5:len(console_entry_command)])), "r") as file:
                 for line in file:
                     editor_window.insert("end", line)
 
+            #Change the current open file
             opened_file = current_dir + "\\" + console_entry_command[5:len(console_entry_command)]
 
+            #Change header in case stupid user forgets.
             editor_label.configure(text=("FILE EDITOR: " + opened_file))
 
             outcome = "\nOpened file \"" + console_entry_command[5:len(console_entry_command)] + "\" in editor!\n"
+
+        #Error occured
         except:
             outcome = "No file specified!"
 
@@ -189,8 +198,9 @@ def entry_enter_pressed(a=0):
         console_entry.delete(0,"end")
 
     #Creates file in CWD
-    elif (console_entry_command[0:6] == "create"):
+    elif (console_entry_command[0:6].lower() == "create"):
 
+        #Creates the file
         open(console_entry_command[7:len(console_entry_command)], "x")
 
         outcome = "\nCreated file \"" + console_entry_command[7:len(console_entry_command)] + "\" in " + current_dir + "!\n"
@@ -199,7 +209,9 @@ def entry_enter_pressed(a=0):
         console_entry.delete(0,"end")
     
     #Saves file in CWD
-    elif (console_entry_command[0:4] == "save"):
+    elif (console_entry_command[0:4].lower() == "save"):
+
+        #Checks if it's just the command "SAVE"
         if (len(console_entry_command) == 4):
             if (opened_file == "" ):
 
@@ -227,13 +239,17 @@ def entry_enter_pressed(a=0):
             console_entry.delete(0,"end")
 
 
-    elif (console_entry_command[0:3] == "del"):
+    elif (console_entry_command[0:3].lower() == "del"):
 
+        #Command splitting magic!
         command = shlex.split(console_entry_command)
 
+        #Makes sure the file exists
         if (os.path.exists(console_entry_command[4:len(console_entry_command)]) == True):
             subprocess.check_output(command, cwd=current_dir, shell=True, text=True)
             outcome = "\nFile \"" + console_entry_command[4:len(console_entry_command)] + "\" deleted\n"
+
+        #Dumbass tried to delete non-existant file
         else:
             outcome = "\nFILE NOT FOUND!\n"
 
