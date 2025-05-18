@@ -13,4 +13,5 @@ It can be installed as follows:
 After installing pyinstaller you can build it by navigating to the directory for the file system you're building for
 
 > cd windows
+> 
 > pyinstaller main.py
